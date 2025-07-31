@@ -1,12 +1,14 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+const { SurveyService } = require('./services/surveyService');
+const { UserService } = require('./services/userService');
+
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 12345;
 
 // Middleware
 app.use(cors());
@@ -15,101 +17,136 @@ app.use(express.static('uploads'));
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/testimonial-survey', {
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
+db.once('open', async () => {
   console.log('Connected to MongoDB');
+  // Initialize default admin user
+  await UserService.initializeDefaultUser();
 });
 
-// Multer configuration for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024 // 5MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed!'), false);
+// Authentication Routes
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Email and password are required' 
+      });
     }
+
+    const result = await UserService.authenticateUser(email, password);
+    
+    if (result.success) {
+      res.json({
+        success: true,
+        message: 'Login successful',
+        user: result.user
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: result.message
+      });
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Login failed' 
+    });
   }
 });
-
-// Survey Schema
-const surveySchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  question1: { type: String, required: true },
-  question2: { type: String, required: true },
-  question3: { type: [String], required: true },
-  question4: { type: String, required: true },
-  question5: { type: String, required: true },
-  photoUrl: { type: String, required: true },
-  submittedAt: { type: Date, default: Date.now }
-});
-
-const Survey = mongoose.model('Survey', surveySchema);
-
-// Create uploads directory if it doesn't exist
-const fs = require('fs');
-if (!fs.existsSync('uploads')) {
-  fs.mkdirSync('uploads');
-}
 
 // API Routes
-app.post('/api/survey', upload.single('photo'), async (req, res) => {
+app.post('/api/survey', SurveyService.getUploadMiddleware(), async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'Photo is required' });
-    }
-
-    const surveyData = {
-      name: req.body.name,
-      email: req.body.email,
-      question1: req.body.question1,
-      question2: req.body.question2,
-      question3: JSON.parse(req.body.question3),
-      question4: req.body.question4,
-      question5: req.body.question5,
-      photoUrl: `/uploads/${req.file.filename}`
-    };
-
-    const survey = new Survey(surveyData);
-    await survey.save();
-
-    res.status(201).json({ 
-      message: 'Survey submitted successfully!',
-      survey: survey
-    });
+    const result = await SurveyService.saveSurvey(req.body, req.file, req);
+    res.status(201).json(result);
   } catch (error) {
     console.error('Error submitting survey:', error);
-    res.status(500).json({ error: 'Failed to submit survey' });
+    res.status(400).json({ 
+      success: false,
+      error: error.message || 'Failed to submit survey' 
+    });
   }
 });
 
 app.get('/api/surveys', async (req, res) => {
   try {
-    const surveys = await Survey.find().sort({ submittedAt: -1 });
-    res.json(surveys);
+    const { page, limit, search, sortBy, sortOrder, filterBy } = req.query;
+    const options = {
+      page: parseInt(page) || 1,
+      limit: parseInt(limit) || 10,
+      search,
+      sortBy: sortBy || 'submittedAt',
+      sortOrder: sortOrder || 'desc',
+      filterBy: filterBy ? JSON.parse(filterBy) : {}
+    };
+    
+    const result = await SurveyService.getSurveys(options);
+    res.json(result);
   } catch (error) {
     console.error('Error fetching surveys:', error);
-    res.status(500).json({ error: 'Failed to fetch surveys' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch surveys' 
+    });
+  }
+});
+
+app.get('/api/statistics', async (req, res) => {
+  try {
+    const result = await SurveyService.getStatistics();
+    res.json(result);
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch statistics' 
+    });
+  }
+});
+
+app.delete('/api/surveys/:id', async (req, res) => {
+  try {
+    const result = await SurveyService.archiveSurvey(req.params.id);
+    res.json(result);
+  } catch (error) {
+    console.error('Error archiving survey:', error);
+    res.status(400).json({ 
+      success: false,
+      error: error.message || 'Failed to archive survey' 
+    });
+  }
+});
+
+// Serve photo from database
+app.get('/api/photo/:id', async (req, res) => {
+  try {
+    const survey = await SurveyService.getSurveyById(req.params.id);
+    if (!survey || !survey.photoData) {
+      return res.status(404).json({ error: 'Photo not found' });
+    }
+    
+    // Extract base64 data
+    const base64Data = survey.photoData.replace(/^data:image\/[a-z]+;base64,/, '');
+    const buffer = Buffer.from(base64Data, 'base64');
+    
+    // Set appropriate headers
+    res.set('Content-Type', 'image/jpeg');
+    res.set('Content-Length', buffer.length);
+    res.send(buffer);
+  } catch (error) {
+    console.error('Error serving photo:', error);
+    res.status(500).json({ error: 'Failed to serve photo' });
   }
 });
 

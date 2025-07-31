@@ -81,7 +81,7 @@ A modern web application for collecting testimonials with photo uploads and Mong
 
 3. **Access the application**
    - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
+   - Backend API: http://localhost:12345
 
 ### Production Mode
 

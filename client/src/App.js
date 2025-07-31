@@ -1,14 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import axios from 'axios';
-import { Upload, Camera, CheckCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle, AlertCircle, BarChart3, LogOut } from 'lucide-react';
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import AdminDashboard from './components/AdminDashboard';
+import DashboardPage from './components/DashboardPage';
+import LoginPage from './components/LoginPage';
 import './App.css';
 
-function App() {
+function ProtectedRoute({ children, user, onLogin, onLogout }) {
+  if (!user) {
+    return <LoginPage onLogin={onLogin} />;
+  }
+
+  return (
+    <div>
+      <div className="auth-header">
+        <div className="user-info">
+          <span>Welcome, {user.name}</span>
+        </div>
+        <button onClick={onLogout} className="logout-btn">
+          <LogOut size={16} />
+          Logout
+        </button>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function SurveyForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    question1: '',
     question2: '',
     question3: [],
     question4: '',
@@ -19,9 +43,13 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
-  const onDrop = (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (file) {
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'image/*': ['.jpeg', '.jpg', '.png', '.gif']
+    },
+    maxFiles: 1,
+    onDrop: (acceptedFiles) => {
+      const file = acceptedFiles[0];
       setPhoto(file);
       const reader = new FileReader();
       reader.onload = () => {
@@ -29,14 +57,6 @@ function App() {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif']
-    },
-    multiple: false
   });
 
   const handleInputChange = (e) => {
@@ -87,9 +107,8 @@ function App() {
       setFormData({
         name: '',
         email: '',
-        question1: '',
         question2: '',
-        question3: '',
+        question3: [],
         question4: '',
         question5: ''
       });
@@ -107,22 +126,43 @@ function App() {
   };
 
   const isFormValid = () => {
-    return formData.name.trim() !== '' && 
-           formData.email.trim() !== '' && 
-           formData.question1.trim() !== '' && 
-           formData.question2.trim() !== '' && 
-           formData.question3.length > 0 && 
-           formData.question4.trim() !== '' && 
-           formData.question5 !== '' && 
-           photo;
+    const nameValid = formData.name.trim() !== '';
+    const emailValid = formData.email.trim() !== '';
+    const question2Valid = formData.question2.trim() !== '';
+    const question3Valid = formData.question3.length > 0;
+    const question4Valid = formData.question4.trim() !== '';
+    const question5Valid = formData.question5 !== '';
+    const photoValid = photo !== null;
+
+    // Debug logging
+    console.log('Form Validation Debug:', {
+      name: formData.name,
+      nameValid,
+      email: formData.email,
+      emailValid,
+      question2: formData.question2,
+      question2Valid,
+      question3: formData.question3,
+      question3Valid,
+      question4: formData.question4,
+      question4Valid,
+      question5: formData.question5,
+      question5Valid,
+      photo: photo,
+      photoValid
+    });
+
+    return nameValid && emailValid && question2Valid && question3Valid && question4Valid && question5Valid && photoValid;
   };
 
   return (
     <div className="container">
       <div className="survey-container">
         <div className="survey-header">
-          <h1>📝 Testimonial Survey</h1>
-          <p>Share your experience with us! Please answer the following questions and upload a photo.</p>
+          <div className="header-content">
+            <h1>📝 Testimonial Survey</h1>
+            <p>Share your experience with us! Please answer the following questions and upload a photo.</p>
+          </div>
         </div>
 
         {message.text && (
@@ -134,7 +174,7 @@ function App() {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="name">Let's start with the basics — what's your name? *</label>
+            <label htmlFor="name">1. Let's start with the basics — what's your name? *</label>
             <input
               type="text"
               id="name"
@@ -160,11 +200,11 @@ function App() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="question1">What's your title + the amazing place you call work? *</label>
+            <label htmlFor="question2">2. What's your title + the amazing place you call work? *</label>
             <textarea
-              id="question1"
-              name="question1"
-              value={formData.question1}
+              id="question2"
+              name="question2"
+              value={formData.question2}
               onChange={handleInputChange}
               required
               placeholder="Tell us about your role and workplace..."
@@ -172,8 +212,8 @@ function App() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="question2">What kind of awesome did we create together? (Select all that apply) *</label>
-            <div className="checkbox-group">
+            <label htmlFor="question2">3. What kind of awesome did we create together? (Select all that apply) *</label>
+            <div className="checkbox-group two-columns">
               {[
                 'Leadership Development',
                 'Talent Assessment',
@@ -201,7 +241,7 @@ function App() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="question4">What was it like working with the NamanHR crew? (You can be honest. We can take it 😄) *</label>
+            <label htmlFor="question4">4. What was it like working with the NamanHR crew? (You can be honest. We can take it 😄) *</label>
             <textarea
               id="question4"
               name="question4"
@@ -213,7 +253,7 @@ function App() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="question5">Cool if we put your name, title, and this quote on our website? (With your photo too — only if you say yes) *</label>
+            <label htmlFor="question5">5. Cool if we put your name, title, and this quote on our website? (With your photo too — only if you say yes) *</label>
             <div className="radio-group">
               {[
                 'Yes, go for it!',
@@ -245,29 +285,14 @@ function App() {
               {photoPreview ? (
                 <div className="photo-preview">
                   <img src={photoPreview} alt="Preview" />
-                  <p style={{ marginTop: '10px', color: '#667eea' }}>
-                    <CheckCircle size={16} style={{ marginRight: '5px' }} />
-                    Photo uploaded successfully!
-                  </p>
+                  <p>Photo uploaded successfully!</p>
                 </div>
               ) : (
-                <div>
-                  {isDragActive ? (
-                    <div>
-                      <Upload size={48} color="#667eea" />
-                      <p style={{ marginTop: '10px', color: '#667eea' }}>Drop the photo here...</p>
-                    </div>
-                  ) : (
-                    <div>
-                      <Camera size={48} color="#667eea" />
-                      <p style={{ marginTop: '10px', color: '#667eea' }}>
-                        Drag & drop a photo here, or click to select
-                      </p>
-                      <p style={{ fontSize: '0.9rem', color: '#999', marginTop: '5px' }}>
-                        Supports: JPG, PNG, GIF (Max 5MB)
-                      </p>
-                    </div>
-                  )}
+                <div className="upload-placeholder">
+                  <p>📸 Click or drag a photo here</p>
+                  <p style={{ fontSize: '0.9rem', color: '#999', marginTop: '5px' }}>
+                    Supports: JPG, PNG, GIF (Max 10MB)
+                  </p>
                 </div>
               )}
             </div>
@@ -278,18 +303,57 @@ function App() {
             className="submit-btn" 
             disabled={!isFormValid() || isSubmitting}
           >
-            {isSubmitting ? (
-              <>
-                <span className="loading"></span>
-                Submitting...
-              </>
-            ) : (
-              'Submit Survey'
-            )}
+            {isSubmitting ? 'Submitting...' : 'Submit Survey'}
           </button>
         </form>
       </div>
     </div>
+  );
+}
+
+function AppContent() {
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in on app load
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
+  const handleLogin = (userData) => {
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem('user');
+    // Redirect to home page after logout
+    navigate('/');
+  };
+
+  return (
+    <Routes>
+      <Route path="/" element={<SurveyForm />} />
+      <Route 
+        path="/dashboard" 
+        element={
+          <ProtectedRoute user={user} onLogin={handleLogin} onLogout={handleLogout}>
+            <DashboardPage />
+          </ProtectedRoute>
+        } 
+      />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 
