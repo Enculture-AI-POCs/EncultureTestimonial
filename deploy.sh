@@ -33,16 +33,16 @@ print_error() {
 
 # Update system packages
 print_status "Updating system packages..."
-sudo dnf update -y
+sudo dnf update -y --allowerasing
 
 # Install essential packages
 print_status "Installing essential packages..."
-sudo dnf install -y curl wget git unzip gcc-c++ make
+sudo dnf install -y curl wget git unzip gcc-c++ make --allowerasing
 
 # Install Node.js 18.x
 print_status "Installing Node.js 18.x..."
 curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo bash -
-sudo dnf install -y nodejs
+sudo dnf install -y nodejs --allowerasing
 
 # Verify Node.js installation
 NODE_VERSION=$(node --version)
@@ -53,49 +53,25 @@ print_success "Node.js $NODE_VERSION and npm $NPM_VERSION installed"
 print_status "Installing PM2 process manager..."
 sudo npm install -g pm2
 
-# Install MongoDB
-print_status "Installing MongoDB..."
-# Create MongoDB repository file
-sudo tee /etc/yum.repos.d/mongodb-org-6.0.repo << EOF
-[mongodb-org-6.0]
-name=MongoDB Repository
-baseurl=https://repo.mongodb.org/yum/amazon/2/mongodb-org/6.0/x86_64/
-gpgcheck=1
-enabled=1
-gpgkey=https://www.mongodb.org/static/pgp/server-6.0.asc
-EOF
-
-sudo dnf install -y mongodb-org
-
-# Create MongoDB data directory
-sudo mkdir -p /var/lib/mongo
-sudo mkdir -p /var/log/mongodb
-sudo chown -R mongod:mongod /var/lib/mongo
-sudo chown -R mongod:mongod /var/log/mongodb
-
-# Start and enable MongoDB
-print_status "Starting MongoDB service..."
-sudo systemctl start mongod
-sudo systemctl enable mongod
-
-# Verify MongoDB is running
-if sudo systemctl is-active --quiet mongod; then
-    print_success "MongoDB is running"
-else
-    print_error "MongoDB failed to start"
-    exit 1
-fi
-
 # Create application directory
 APP_DIR="/opt/testimonial-app"
 print_status "Creating application directory at $APP_DIR..."
 sudo mkdir -p $APP_DIR
 sudo chown $USER:$USER $APP_DIR
 
-# Copy application files (assuming script is run from project root)
-print_status "Copying application files..."
-cp -r . $APP_DIR/
+# Navigate to app directory
 cd $APP_DIR
+
+# Clone the repository (replace with your Git URL)
+print_status "Cloning repository..."
+# You can replace this with your actual Git repository URL
+# git clone https://github.com/yourusername/testimonial-survey-app.git .
+# OR use a private repository with authentication
+# git clone https://username:token@github.com/yourusername/testimonial-survey-app.git .
+
+# For now, we'll create a placeholder for the Git clone
+echo "Please replace the git clone command with your actual repository URL"
+echo "Example: git clone https://github.com/yourusername/testimonial-survey-app.git ."
 
 # Create uploads directory
 mkdir -p uploads
@@ -112,11 +88,11 @@ print_status "Building React application..."
 npm run build
 cd ..
 
-# Create environment file
+# Create environment file with MongoDB Atlas connection
 print_status "Creating environment configuration..."
 cat > .env << EOF
-# MongoDB Connection String
-MONGODB_URI=mongodb://localhost:27017/testimonial-survey
+# MongoDB Atlas Connection String
+MONGODB_URI=mongodb+srv://ram:c9w8ooSuBKhr80FI@testimonials.g3g5r2f.mongodb.net/?retryWrites=true&w=majority&appName=Testimonials
 
 # Server Port
 PORT=12345
@@ -177,7 +153,7 @@ print_success "Firewall configured"
 
 # Install and configure nginx
 print_status "Installing and configuring nginx..."
-sudo dnf install -y nginx
+sudo dnf install -y nginx --allowerasing
 
 cat > testimonial-app << EOF
 server {
@@ -236,10 +212,8 @@ cat > health-check.sh << 'EOF'
 # Health check script
 
 APP_URL="http://localhost:12345"
-MONGO_STATUS=$(sudo systemctl is-active mongod)
 
 echo "=== Health Check ==="
-echo "MongoDB Status: $MONGO_STATUS"
 echo "PM2 Status:"
 pm2 status
 echo "Application Status:"
@@ -255,7 +229,7 @@ echo ""
 echo "📋 Deployment Summary:"
 echo "======================"
 echo "• Application directory: $APP_DIR"
-echo "• MongoDB: Installed and running"
+echo "• MongoDB: Using MongoDB Atlas (cloud database)"
 echo "• Node.js: $NODE_VERSION"
 echo "• PM2: Application managed by PM2"
 echo "• Port: 12345"
