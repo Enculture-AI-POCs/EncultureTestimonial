@@ -159,9 +159,14 @@ function SurveyForm() {
     <div className="container">
       <div className="survey-container">
         <div className="survey-header">
-          <div className="header-content">
-            <h1>📝 Testimonial Survey</h1>
-            <p>Share your experience with us! Please answer the following questions and upload a photo.</p>
+          <div className="logo-section">
+            <img src={process.env.PUBLIC_URL + '/NamanLogo.png'} alt="NamanHR Logo" className="header-logo" />
+          </div>
+          <div className="header-section">
+            <h1> Testimonial Survey * NamanHR</h1>
+          </div>
+          <div className="header-section">            
+            <p>You've been part of our story — now we'd love to feature you in it. Just a few quick questions, and you might just land yourself a cameo on our brand-new website (with credits, ofcourse)!!!</p>
           </div>
         </div>
 

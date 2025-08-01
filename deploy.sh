@@ -59,19 +59,8 @@ print_status "Creating application directory at $APP_DIR..."
 sudo mkdir -p $APP_DIR
 sudo chown $USER:$USER $APP_DIR
 
-# Navigate to app directory
+# Navigate to app directory (assuming repository is already cloned)
 cd $APP_DIR
-
-# Clone the repository (replace with your Git URL)
-print_status "Cloning repository..."
-# You can replace this with your actual Git repository URL
-# git clone https://github.com/yourusername/testimonial-survey-app.git .
-# OR use a private repository with authentication
-# git clone https://username:token@github.com/yourusername/testimonial-survey-app.git .
-
-# For now, we'll create a placeholder for the Git clone
-echo "Please replace the git clone command with your actual repository URL"
-echo "Example: git clone https://github.com/yourusername/testimonial-survey-app.git ."
 
 # Create uploads directory
 mkdir -p uploads
