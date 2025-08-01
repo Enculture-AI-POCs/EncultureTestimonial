@@ -1,9 +1,11 @@
-/* Additional styles for App component */
+/* === General Layout Styles === */
 .survey-container {
   position: relative;
   overflow: hidden;
 }
-
+.container{
+  /* background-color: #28a745; */
+}
 .survey-header {
   position: relative;
   display: flex;
@@ -14,12 +16,22 @@
 
 .logo-section {
   align-self: flex-start;
-  margin-bottom: 20px;
+
 }
 
 .header-section {
+  width: 9%;
+}
+
+.header-new {
   text-align: center;
-  width: 100%;
+  align-items: center;
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
+  margin: -30px auto 30px auto;
 }
 
 .header-logo {
@@ -50,6 +62,7 @@
   color: #666;
 }
 
+/* === Buttons === */
 .admin-toggle-btn {
   background: #3182ce;
   color: white;
@@ -69,23 +82,27 @@
   transform: translateY(-1px);
 }
 
-.survey-container::before {
+.submit-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-btn::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.03), transparent);
-  animation: shimmer 3s ease-in-out infinite;
-  pointer-events: none;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
-@keyframes shimmer {
-  0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
-  100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
+.submit-btn:hover::before {
+  left: 100%;
 }
 
+/* === Placeholder & Input Validation === */
 .form-group input::placeholder,
 .form-group textarea::placeholder {
   color: #999;
@@ -102,6 +119,7 @@
   border-color: #28a745;
 }
 
+/* === Image Upload === */
 .photo-upload {
   position: relative;
   overflow: hidden;
@@ -134,24 +152,22 @@
   transform: scale(1.05);
 }
 
-.submit-btn {
-  position: relative;
-  overflow: hidden;
-}
-
-.submit-btn::before {
+/* === Animation === */
+.survey-container::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.03), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
-.submit-btn:hover::before {
-  left: 100%;
+@keyframes shimmer {
+  0% { transform: translateX(-100%) translateY(-100%) rotate(0deg); }
+  100% { transform: translateX(100%) translateY(100%) rotate(360deg); }
 }
 
 .success-message,
@@ -173,7 +189,43 @@
   }
 }
 
-/* Checkbox and Radio Button Styles */
+/* === Authentication Header === */
+.auth-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.user-info {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+}
+
+/* === Checkbox and Radio Styles === */
 .checkbox-group,
 .radio-group {
   display: flex;
@@ -214,6 +266,7 @@
   display: none;
 }
 
+/* === Fixed Checkmark Styles === */
 .checkmark,
 .radiomark {
   position: relative;
@@ -221,10 +274,15 @@
   height: 20px;
   margin-right: 12px;
   border: 2px solid #cbd5e0;
-  border-radius: 4px;
   background: white;
   transition: all 0.2s ease;
   flex-shrink: 0;
+  display: inline-block;
+  box-sizing: border-box;
+}
+
+.checkmark {
+  border-radius: 4px;
 }
 
 .radiomark {
@@ -236,6 +294,7 @@
   border-color: #3182ce;
 }
 
+/* === Checked States === */
 .checkbox-label input:checked + .checkmark {
   background: #3182ce;
   border-color: #3182ce;
@@ -275,85 +334,50 @@
   font-weight: 600;
 }
 
-.checkbox-label input:checked,
-.radio-label input:checked {
-  background: #f0f9ff;
-  border-color: #3182ce;
-}
-
-/* Responsive improvements */
+/* === Responsive Fixes === */
 @media (max-width: 480px) {
   .survey-container {
     padding: 15px;
     margin: 5px 0;
   }
-  
+
   .survey-header h1 {
     font-size: 1.8rem;
   }
-  
+
   .survey-header p {
     font-size: 1rem;
   }
-  
+
   .form-group input,
   .form-group textarea {
     padding: 10px 12px;
     font-size: 0.95rem;
   }
-  
+
   .photo-upload {
     padding: 30px 20px;
   }
-  
+
   .submit-btn {
     padding: 12px 20px;
     font-size: 1rem;
   }
-  
+
   .checkbox-label,
   .radio-label {
     padding: 8px;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
   }
-  
+  .height-fix{
+    margin-top: 7px;
+  }
+
   .checkbox-group.two-columns {
     grid-template-columns: 1fr;
   }
 }
 
-/* Authentication Header */
-.auth-header {
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
-  padding: 12px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.user-info {
-  color: #374151;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.logout-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  background: #dc2626;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.logout-btn:hover {
-  background: #b91c1c;
-} 
+ 

@@ -157,162 +157,208 @@ function SurveyForm() {
 
   return (
     <div className="container">
-      <div className="survey-container">
-        <div className="survey-header">
-          <div className="logo-section">
-            <img src={process.env.PUBLIC_URL + '/NamanLogo.png'} alt="NamanHR Logo" className="header-logo" />
-          </div>
-          <div className="header-section">
-            <h1> Testimonial Survey * NamanHR</h1>
-          </div>
-          <div className="header-section">            
-            <p>You've been part of our story — now we'd love to feature you in it. Just a few quick questions, and you might just land yourself a cameo on our brand-new website (with credits, ofcourse)!!!</p>
+    <div className="survey-container">
+      <div className="survey-header">
+        <div className="logo-section">
+          <img
+            src={process.env.PUBLIC_URL + "/NamanLogo.png"}
+            alt="NamanHR Logo"
+            className="header-logo"
+          />
+        </div>
+      </div>
+      <div className="header-new">
+        <h1> Testimonial Survey * NamanHR</h1>
+        <p>
+          You've been part of our story — now we'd love to feature you in it.
+          Just a few quick questions, and you might just land yourself a cameo
+          on our brand-new website (with credits, ofcourse)!!!
+        </p>
+      </div>
+      {message.text && (
+        <div
+          className={`${
+            message.type === "success" ? "success-message" : "error-message"
+          }`}
+        >
+          {message.type === "success" ? (
+            <CheckCircle size={20} />
+          ) : (
+            <AlertCircle size={20} />
+          )}
+          <span style={{ marginLeft: "10px" }}>{message.text}</span>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="name">
+            1. Let's start with the basics — what's your name? *
+          </label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            value={formData.name}
+            onChange={handleInputChange}
+            required
+            placeholder="Enter your full name"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="email">Email Address *</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            required
+            placeholder="Enter your email address"
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="question2">
+            2. What's your title + the amazing place you call work? *
+          </label>
+          <textarea
+            id="question2"
+            name="question2"
+            value={formData.question2}
+            onChange={handleInputChange}
+            required
+            placeholder="Tell us about your role and workplace..."
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="question2">
+            3. What kind of awesome did we create together? (Select all that
+            apply) *
+          </label>
+          <div className="checkbox-group two-columns">
+            {[
+              "Leadership Development",
+              "Talent Assessment",
+              "Assessment and Development Centre",
+              "Strength Based Development",
+              "Competency Mapping",
+              "Executive Coaching",
+              "Learning Design & Delivery",
+              "Performance Management System (PMS)",
+              "OD & Culture Change",
+              "Climate Survey",
+              "Other",
+            ].map((option) => (
+              <label
+                key={option}
+                className="checkbox-label"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  checked={formData.question3.includes(option)}
+                  onChange={() => handleMultiSelect(option)}
+                />
+                <span className="checkmark height-fix"></span>
+                {option}
+              </label>
+            ))}
           </div>
         </div>
 
-        {message.text && (
-          <div className={`${message.type === 'success' ? 'success-message' : 'error-message'}`}>
-            {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-            <span style={{ marginLeft: '10px' }}>{message.text}</span>
-          </div>
-        )}
+        <div className="form-group">
+          <label htmlFor="question4">
+            4. What was it like working with the NamanHR crew? (You can be
+            honest. We can take it 😄) *
+          </label>
+          <textarea
+            id="question4"
+            name="question4"
+            value={formData.question4}
+            onChange={handleInputChange}
+            required
+            placeholder="Was it the people? The energy? The clarity? A breakthrough moment? We'd love to hear what made the difference..."
+          />
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">1. Let's start with the basics — what's your name? *</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter your full name"
-            />
+        <div className="form-group">
+          <label htmlFor="question5">
+            5. Cool if we put your name, title, and this quote on our website?
+            (With your photo too — only if you say yes) *
+          </label>
+          <div className="radio-group">
+            {[
+              "Yes, go for it!",
+              "I'd rather not — keeping it between us",
+              "Sure, but show me before you post",
+            ].map((option) => (
+              <label
+                key={option}
+                className="radio-label"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
+                <input
+                  type="radio"
+                  name="question5"
+                  value={option}
+                  checked={formData.question5 === option}
+                  onChange={handleInputChange}
+                />
+                <span className="radiomark"></span>
+                {option}
+              </label>
+            ))}
           </div>
+        </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email Address *</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              required
-              placeholder="Enter your email address"
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="question2">2. What's your title + the amazing place you call work? *</label>
-            <textarea
-              id="question2"
-              name="question2"
-              value={formData.question2}
-              onChange={handleInputChange}
-              required
-              placeholder="Tell us about your role and workplace..."
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="question2">3. What kind of awesome did we create together? (Select all that apply) *</label>
-            <div className="checkbox-group two-columns">
-              {[
-                'Leadership Development',
-                'Talent Assessment',
-                'Assessment and Development Centre',
-                'Strength Based Development',
-                'Competency Mapping',
-                'Executive Coaching',
-                'Learning Design & Delivery',
-                'Performance Management System (PMS)',
-                'OD & Culture Change',
-                'Climate Survey',
-                'Other'
-              ].map((option) => (
-                <label key={option} className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.question3.includes(option)}
-                    onChange={() => handleMultiSelect(option)}
-                  />
-                  <span className="checkmark"></span>
-                  {option}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="question4">4. What was it like working with the NamanHR crew? (You can be honest. We can take it 😄) *</label>
-            <textarea
-              id="question4"
-              name="question4"
-              value={formData.question4}
-              onChange={handleInputChange}
-              required
-              placeholder="Was it the people? The energy? The clarity? A breakthrough moment? We'd love to hear what made the difference..."
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="question5">5. Cool if we put your name, title, and this quote on our website? (With your photo too — only if you say yes) *</label>
-            <div className="radio-group">
-              {[
-                'Yes, go for it!',
-                'I\'d rather not — keeping it between us',
-                'Sure, but show me before you post'
-              ].map((option) => (
-                <label key={option} className="radio-label">
-                  <input
-                    type="radio"
-                    name="question5"
-                    value={option}
-                    checked={formData.question5 === option}
-                    onChange={handleInputChange}
-                  />
-                  <span className="radiomark"></span>
-                  {option}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Upload a Photo *</label>
-            <div 
-              {...getRootProps()} 
-              className={`photo-upload ${isDragActive ? 'dragover' : ''}`}
-            >
-              <input {...getInputProps()} />
-              {photoPreview ? (
-                <div className="photo-preview">
-                  <img src={photoPreview} alt="Preview" />
-                  <p>Photo uploaded successfully!</p>
-                </div>
-              ) : (
-                <div className="upload-placeholder">
-                  <p>📸 Click or drag a photo here</p>
-                  <p style={{ fontSize: '0.9rem', color: '#999', marginTop: '5px' }}>
-                    Supports: JPG, PNG, GIF (Max 10MB)
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <button 
-            type="submit" 
-            className="submit-btn" 
-            disabled={!isFormValid() || isSubmitting}
+        <div className="form-group">
+          <label>Upload a Photo *</label>
+          <div
+            {...getRootProps()}
+            className={`photo-upload ${isDragActive ? "dragover" : ""}`}
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Survey'}
-          </button>
-        </form>
-      </div>
+            <input {...getInputProps()} />
+            {photoPreview ? (
+              <div className="photo-preview">
+                <img src={photoPreview} alt="Preview" />
+                <p>Photo uploaded successfully!</p>
+              </div>
+            ) : (
+              <div className="upload-placeholder">
+                <p>📸 Click or drag a photo here</p>
+                <p
+                  style={{
+                    fontSize: "0.9rem",
+                    color: "#999",
+                    marginTop: "5px",
+                  }}
+                >
+                  Supports: JPG, PNG, GIF (Max 10MB)
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="submit-btn"
+          disabled={!isFormValid() || isSubmitting}
+        >
+          {isSubmitting ? "Submitting..." : "Submit Survey"}
+        </button>
+      </form>
     </div>
+  </div>
   );
 }
 
