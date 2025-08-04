@@ -13,6 +13,7 @@ cd /opt/testimonial-app
 # Stop the application
 pm2 stop testimonial-app
 
+cd client
 # Remove old node_modules and package-lock files
 echo "🧹 Cleaning old node files..."
 rm -rf node_modules package-lock.json
