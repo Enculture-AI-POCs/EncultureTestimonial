@@ -26,12 +26,12 @@
 .header-new {
   text-align: center;
   align-items: center;
-  width: 70%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 15px;
-  margin: -30px auto 30px auto;
+  gap: 7px;
+  margin: -30px auto 50px auto;
 }
 
 .header-logo {
@@ -377,6 +377,161 @@
 
   .checkbox-group.two-columns {
     grid-template-columns: 1fr;
+  }
+}
+
+/* === Dialog Modal Styles === */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.dialog-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  max-width: 400px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px 0;
+}
+
+.dialog-close {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-close:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.dialog-body {
+  padding: 0 24px 24px;
+  text-align: center;
+}
+
+.dialog-icon {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.dialog-icon.success {
+  color: #10b981;
+}
+
+.dialog-icon.error {
+  color: #ef4444;
+}
+
+.dialog-title {
+  margin: 0 0 12px 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.dialog-message {
+  margin: 0 0 24px 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #6b7280;
+}
+
+.dialog-footer {
+  padding: 0 24px 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.dialog-btn {
+  background: #3182ce;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.dialog-btn:hover {
+  background: #2c5aa0;
+  transform: translateY(-1px);
+}
+
+.dialog-btn:active {
+  transform: translateY(0);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* === Responsive Dialog === */
+@media (max-width: 480px) {
+  .dialog-content {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .dialog-body {
+    padding: 0 20px 20px;
+  }
+  
+  .dialog-footer {
+    padding: 0 20px 20px;
+  }
+  
+  .dialog-title {
+    font-size: 1.3rem;
+  }
+  
+  .dialog-message {
+    font-size: 0.95rem;
   }
 }
 
