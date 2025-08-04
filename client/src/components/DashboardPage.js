@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import { Search, Download, Trash2, Eye, BarChart3, Users, FileText, Calendar, TrendingUp, Activity } from 'lucide-react';
+import { Search, Download, Trash2, BarChart3, Users, FileText, Calendar, TrendingUp, Activity } from 'lucide-react';
 import './AdminDashboard.css';
 
 function DashboardPage() {
@@ -19,9 +19,9 @@ function DashboardPage() {
   useEffect(() => {
     fetchSurveys();
     fetchStatistics();
-  }, [currentPage, searchTerm]);
+  }, [fetchSurveys, fetchStatistics]);
 
-  const fetchSurveys = async () => {
+  const fetchSurveys = useCallback(async () => {
     try {
       const response = await axios.get(`/api/surveys?page=${currentPage}&limit=${surveysPerPage}&search=${searchTerm}`);
       setSurveys(response.data.surveys);
@@ -29,9 +29,9 @@ function DashboardPage() {
     } catch (error) {
       console.error('Error fetching surveys:', error);
     }
-  };
+  }, [currentPage, searchTerm]);
 
-  const fetchStatistics = async () => {
+  const fetchStatistics = useCallback(async () => {
     try {
       const response = await axios.get('/api/statistics');
       setStatistics(response.data);
@@ -40,7 +40,7 @@ function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -63,10 +63,10 @@ function DashboardPage() {
     }
   };
 
-  const handleViewDetails = (survey) => {
-    setSelectedSurvey(survey);
-    setShowModal(true);
-  };
+  // const handleViewDetails = (survey) => {
+  //   setSelectedSurvey(survey);
+  //   setShowModal(true);
+  // };
 
   const exportToCSV = () => {
     const headers = ['Name', 'Email', 'Title & Workplace', 'Services', 'Experience', 'Permission', 'Submitted At'];
@@ -202,7 +202,7 @@ function DashboardPage() {
                   {survey.photoData ? (
                     <img 
                       src={survey.photoData} 
-                      alt={`${survey.name}'s photo`}
+                      alt={`${survey.name}`}
                       className="avatar-image"
                     />
                   ) : (
@@ -323,7 +323,7 @@ function DashboardPage() {
                   <strong>Photo:</strong>
                   <img 
                     src={selectedSurvey.photoData} 
-                    alt="Survey photo" 
+                    alt="Survey participant" 
                     style={{ maxWidth: '200px', marginTop: '10px' }}
                   />
                 </div>
