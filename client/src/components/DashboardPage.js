@@ -16,11 +16,6 @@ function DashboardPage() {
 
   const surveysPerPage = 10;
 
-  useEffect(() => {
-    fetchSurveys();
-    fetchStatistics();
-  }, [fetchSurveys, fetchStatistics]);
-
   const fetchSurveys = useCallback(async () => {
     try {
       const response = await axios.get(`/api/surveys?page=${currentPage}&limit=${surveysPerPage}&search=${searchTerm}`);
@@ -41,6 +36,11 @@ function DashboardPage() {
       setLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    fetchSurveys();
+    fetchStatistics();
+  }, [fetchSurveys, fetchStatistics]);
 
   const handleSearch = (e) => {
     e.preventDefault();
