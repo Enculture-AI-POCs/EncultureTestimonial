@@ -38,8 +38,7 @@
   max-width: 100px;
   height: auto;
   margin-bottom: 30px;
-  display: block;
-  border: 1px solid #ddd;
+  display: block;  
   align-self: flex-start;
 }
 
