@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 12345;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('uploads'));
-app.use(express.static(path.join(__dirname, 'client/build')));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI, {
@@ -149,6 +148,9 @@ app.get('/api/photo/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to serve photo' });
   }
 });
+
+// Serve React app static files
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 // Serve React app for any other routes
 app.get('*', (req, res) => {
