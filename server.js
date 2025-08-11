@@ -131,8 +131,12 @@ app.delete('/api/surveys/:id', async (req, res) => {
 app.get('/api/photo/:id', async (req, res) => {
   try {
     const survey = await SurveyService.getSurveyById(req.params.id);
-    if (!survey || !survey.photoData) {
-      return res.status(404).json({ error: 'Photo not found' });
+    if (!survey) {
+      return res.status(404).json({ error: 'Survey not found' });
+    }
+    
+    if (!survey.photoData) {
+      return res.status(404).json({ error: 'No photo uploaded for this survey' });
     }
     
     // Extract base64 data

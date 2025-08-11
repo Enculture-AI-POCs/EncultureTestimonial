@@ -156,7 +156,7 @@ function SurveyForm() {
     const question3Valid = formData.question3.length > 0;
     const question4Valid = formData.question4.trim() !== "";
     const question5Valid = formData.question5 !== "";
-    const photoValid = photo !== null;
+    // Photo is now optional - removed photoValid check
 
     // Debug logging
     console.log("Form Validation Debug:", {
@@ -173,7 +173,7 @@ function SurveyForm() {
       question5: formData.question5,
       question5Valid,
       photo: photo,
-      photoValid,
+      photoValid: "Optional",
     });
 
     return (
@@ -182,8 +182,8 @@ function SurveyForm() {
       question2Valid &&
       question3Valid &&
       question4Valid &&
-      question5Valid &&
-      photoValid
+      question5Valid
+      // Removed photoValid from validation
     );
   };
 
@@ -377,7 +377,7 @@ function SurveyForm() {
           </div>
 
           <div className="form-group">
-            <label>Upload a Photo *</label>
+            <label>Upload a Photo (Optional)</label>
             <div
               {...getRootProps()}
               className={`photo-upload ${isDragActive ? "dragover" : ""}`}
@@ -390,7 +390,7 @@ function SurveyForm() {
                 </div>
               ) : (
                 <div className="upload-placeholder">
-                  <p>📸 Click or drag a photo here</p>
+                  <p>📸 Click or drag a photo here (Optional)</p>
                   <p
                     style={{
                       fontSize: "0.9rem",

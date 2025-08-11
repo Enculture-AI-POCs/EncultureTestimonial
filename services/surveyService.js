@@ -43,15 +43,15 @@ const surveySchema = new mongoose.Schema({
   },
   photoUrl: { 
     type: String, 
-    required: true
+    required: false
   },
   photoFileName: {
     type: String,
-    required: true
+    required: false
   },
   photoData: {
     type: String,
-    required: true
+    required: false
   },
   submittedAt: { 
     type: Date, 
@@ -135,16 +135,20 @@ class SurveyService {
         throw new Error('Invalid email format');
       }
 
-      // Check if photo is provided
-      if (!file) {
-        throw new Error('Photo is required');
-      }
+      // Photo is now optional
+      let photoUrl = null;
+      let photoFileName = null;
+      let photoData = null;
 
-      // Convert photo to base64
-      const photoBuffer = fs.readFileSync(file.path);
-      const photoBase64 = photoBuffer.toString('base64');
-      const photoMimeType = file.mimetype;
-      const photoData = `data:${photoMimeType};base64,${photoBase64}`;
+      if (file) {
+        // Convert photo to base64
+        const photoBuffer = fs.readFileSync(file.path);
+        const photoBase64 = photoBuffer.toString('base64');
+        const photoMimeType = file.mimetype;
+        photoData = `data:${photoMimeType};base64,${photoBase64}`;
+        photoUrl = `/uploads/${file.filename}`;
+        photoFileName = file.filename;
+      }
 
       // Create survey object
       const survey = new Survey({
@@ -155,8 +159,8 @@ class SurveyService {
         question3: Array.isArray(surveyData.question3) ? surveyData.question3 : JSON.parse(surveyData.question3),
         question4: surveyData.question4.trim(),
         question5: surveyData.question5.trim(),
-        photoUrl: `/uploads/${file.filename}`,
-        photoFileName: file.filename,
+        photoUrl: photoUrl,
+        photoFileName: photoFileName,
         photoData: photoData,
         ipAddress: req.ip || req.connection.remoteAddress,
         userAgent: req.get('User-Agent')
